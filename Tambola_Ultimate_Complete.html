@@ -1,0 +1,38 @@
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tambola Ultimate Complete</title>
+<style>
+body{font-family:Arial;background:linear-gradient(135deg,#063,#111);color:#FFD700;text-align:center}
+#num{font-size:70px;color:#00ff66;text-shadow:0 0 15px #00ff66}
+button,input,select{background:#222;color:#FFD700;border:1px solid #FFD700;padding:8px;margin:3px}
+.board{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;max-width:1000px;margin:auto}
+.cell{background:#111;border:1px solid #555;padding:8px}.called{background:#0a5;color:#fff}
+table{width:95%;margin:auto;border-collapse:collapse}th,td{border:1px solid #555;padding:6px}
+#host{display:none;position:fixed;top:10px;right:10px;background:#111;padding:10px;border:2px solid gold}
+#summary{border:1px solid gold;margin:10px;padding:10px}
+</style></head><body>
+<h1 id="title">💰 TAMBOLA ULTIMATE COMPLETE 💰</h1>
+<div id=num>--</div>
+<button onclick="nextNum()">Next</button>
+<button onclick="startAuto()">▶ Auto</button>
+<button onclick="stopAuto()">⏸ Stop</button>
+<button onclick="location.reload()">🔄 Reset</button>
+<select id=speed><option value=1000>1s</option><option value=3000>3s</option><option value=4000 selected>4s</option><option value=5000>5s</option></select>
+<p id=hist></p><div class=board id=board></div>
+<h2>🏆 Prize Manager</h2>
+<input id=pn placeholder="Prize"><input id=pa type=number placeholder="₹ Amount"><button onclick="addPrize()">➕ Add Prize</button>
+<table id=pt><tr><th>Prize</th><th>Amount</th><th>Winner</th><th>Claim</th><th>Time</th></tr></table>
+<div id=summary><h3>💰 Winner Summary</h3><div id=winners>No winners yet</div><b>Total Prize Distributed: ₹<span id=total>0</span></b></div>
+<div id=host><h3>🔐 Host</h3><input id=force type=number min=1 max=90><button onclick="setForce()">Set Next</button></div>
+<script>
+let pool=[],called=[],timer=null,forced=null,totals={},grand=0,taps=0,tt;
+const words=["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen","Twenty","Twenty One","Twenty Two","Twenty Three","Twenty Four","Twenty Five","Twenty Six","Twenty Seven","Twenty Eight","Twenty Nine","Thirty","Thirty One","Thirty Two","Thirty Three","Thirty Four","Thirty Five","Thirty Six","Thirty Seven","Thirty Eight","Thirty Nine","Forty","Forty One","Forty Two","Forty Three","Forty Four","Forty Five","Forty Six","Forty Seven","Forty Eight","Forty Nine","Fifty","Fifty One","Fifty Two","Fifty Three","Fifty Four","Fifty Five","Fifty Six","Fifty Seven","Fifty Eight","Fifty Nine","Sixty","Sixty One","Sixty Two","Sixty Three","Sixty Four","Sixty Five","Sixty Six","Sixty Seven","Sixty Eight","Sixty Nine","Seventy","Seventy One","Seventy Two","Seventy Three","Seventy Four","Seventy Five","Seventy Six","Seventy Seven","Seventy Eight","Seventy Nine","Eighty","Eighty One","Eighty Two","Eighty Three","Eighty Four","Eighty Five","Eighty Six","Eighty Seven","Eighty Eight","Eighty Nine","Ninety"];
+for(let i=1;i<=90;i++){pool.push(i);let d=document.createElement('div');d.className='cell';d.id='n'+i;d.innerText=i;board.appendChild(d);}
+function speak(n){if(speechSynthesis){speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(words[n]);u.lang='en-IN';u.rate=.75;u.pitch=.8;speechSynthesis.speak(u);}}
+function nextNum(){if(!pool.length){stopAuto();num.innerText='💰 JACKPOT 💰';return;}let n=forced&&pool.includes(forced)?forced:pool[Math.floor(Math.random()*pool.length)];pool.splice(pool.indexOf(n),1);forced=null;called.push(n);num.innerText=n;hist.innerText=called.join(', ');document.getElementById('n'+n).classList.add('called');speak(n);}
+function startAuto(){stopAuto();timer=setInterval(nextNum,+speed.value)} function stopAuto(){if(timer)clearInterval(timer)}
+function render(){let s='';for(let k in totals)s+='🏆 '+k+' : ₹'+totals[k]+'<br>';winners.innerHTML=s||'No winners yet';total.innerText=grand;}
+function addPrize(){let n=pn.value.trim(),a=parseInt(pa.value);if(!n||!a)return;let r=pt.insertRow();r.insertCell().innerText=n;r.insertCell().innerText='₹'+a;let w=r.insertCell();w.innerHTML='<input placeholder="Winner">';let c=r.insertCell();let b=document.createElement('button');b.innerText='Claim';b.onclick=()=>{let nm=w.children[0].value.trim();if(!nm)return alert('Winner');totals[nm]=(totals[nm]||0)+a;grand+=a;render();r.cells[4].innerText=new Date().toLocaleTimeString();b.innerText='✅';b.disabled=true;w.children[0].disabled=true;};c.appendChild(b);r.insertCell().innerText='-';pn.value='';pa.value='';}
+function setForce(){let n=parseInt(force.value);if(n>=1&&n<=90&&pool.includes(n)){forced=n;host.style.display='none';}}
+title.onclick=()=>{taps++;clearTimeout(tt);tt=setTimeout(()=>taps=0,2000);if(taps>=5){host.style.display=host.style.display==='block'?'none':'block';taps=0;}}
+render();
+</script></body></html>
